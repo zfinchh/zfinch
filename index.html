@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>zfinch OSRS Command Center v6.7</title>
+<style>
+:root{--bg:#0b1020;--panel:#11182b;--panel2:#17213a;--text:#eaf0ff;--muted:#98a6c7;--green:#35d07f;--red:#ff5c77;--yellow:#ffd166;--blue:#63a4ff;--border:#263454;}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#080c18,#101831);color:var(--text);font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;}
+header{padding:22px 24px;border-bottom:1px solid var(--border);background:rgba(8,12,24,.8);position:sticky;top:0;backdrop-filter:blur(8px);z-index:5}
+h1{margin:0;font-size:24px}.sub{color:var(--muted);font-size:13px;margin-top:4px}.wrap{max-width:1250px;margin:0 auto;padding:18px}.grid{display:grid;grid-template-columns:330px 1fr;gap:16px}.card{background:rgba(17,24,43,.92);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+label{display:block;color:var(--muted);font-size:12px;margin:12px 0 6px} input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:#0e1526;color:var(--text);font-size:14px} button{border:0;border-radius:12px;padding:12px 14px;background:var(--blue);color:white;font-weight:700;cursor:pointer;width:100%;margin-top:12px}button.secondary{background:#263454}button.money{background:linear-gradient(135deg,#16c784,#35d07f);color:#05130b;font-size:16px}.stat{display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:8px 0;color:var(--muted)}.stat b{color:var(--text)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tab{width:auto;background:#17213a;color:var(--muted);padding:9px 12px;margin:0}.tab.active{background:#263e73;color:#fff}.recommend{border:1px solid rgba(53,208,127,.45);background:linear-gradient(135deg,rgba(53,208,127,.15),rgba(99,164,255,.08));padding:16px;border-radius:15px;margin-bottom:14px}.recTitle{font-size:14px;color:var(--muted)}.recMain{font-size:22px;font-weight:800;margin:4px 0}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#263454;color:var(--muted);font-size:12px;margin:2px}.good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)}
+.scroll{overflow:auto;max-height:67vh;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;min-width:1180px;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed}
+th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:right;vertical-align:top;background:rgba(17,24,43,.96)}
+th:first-child,td:first-child{text-align:left;width:175px}
+th:nth-child(2),td:nth-child(2){text-align:left;width:390px;white-space:normal;line-height:1.35}
+th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){width:88px}
+th:nth-child(5),td:nth-child(5),th:nth-child(6),td:nth-child(6),th:nth-child(7),td:nth-child(7){width:105px}
+th:nth-child(8),td:nth-child(8){width:75px} th:nth-child(9),td:nth-child(9){width:90px} th:nth-child(10),td:nth-child(10){width:70px}
+th{color:#b8c7ee;font-size:12px;background:#0e1526;position:sticky;top:0;z-index:10;box-shadow:0 1px 0 var(--border),0 4px 10px rgba(0,0,0,.35)}
+tbody tr:hover td{background:#141f38}
+.small{font-size:12px;color:var(--muted);line-height:1.45}.hidden{display:none}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.footer{color:var(--muted);font-size:12px;margin-top:12px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}th{position:static}.scroll{max-height:none}table{min-width:1050px}}
+</style>
+</head>
+<body>
+<header><h1>zfinch OSRS Command Center <span class="pill">v6.7 readable table build</span></h1><div class="sub">Live OSRS Wiki market scanner · decanting · enchanting · bank optimizer</div></header>
+<div class="wrap"><div class="grid"><aside class="card">
+<h3>Scanner Settings</h3>
+<label>Bank GP</label><input id="bank" type="number" value="500000" min="0" step="1000" />
+<label>Magic Level</label><input id="magic" type="number" value="49" min="1" max="99" />
+<label>Minimum Net Profit / Cycle</label><input id="minProfit" type="number" value="25" />
+<label>Liquidity Preset</label><select id="liq"><option value="0">Debug - no volume filter</option><option value="5">Light - 5+ cycles/5m</option><option value="15" selected>Balanced - 15+ cycles/5m</option><option value="50">Recommended - 50+ cycles/5m</option><option value="100">Fast - 100+ cycles/5m</option></select>
+<label>Safety Mode</label><select id="safety"><option value="balanced" selected>Balanced tradable items</option><option value="staples">Staples only - safest</option><option value="all">Show all supported items</option></select>
+<label>Price Mode</label><select id="priceMode"><option value="offer" selected>Offer prices: buy low / sell high</option><option value="instant">Instant prices: buy high / sell low</option></select>
+<button class="money" onclick="scan()">PRINT MONEY</button><button class="secondary" onclick="toggleDebug()">Toggle Debug</button>
+<div style="margin-top:14px"><div class="stat"><span>Status</span><b id="status">Ready</b></div><div class="stat"><span>Opportunities</span><b id="count">0</b></div><div class="stat"><span>Best Score</span><b id="bestScore">-</b></div><div class="stat"><span>Last Scan</span><b id="lastScan">-</b></div></div>
+<p class="small">Recommended testing: min profit <b>10–25</b>, liquidity <b>15+ cycles/5m</b>, safety <b>Balanced</b>. Use Debug/no volume filter if you want to see everything.</p>
+</aside><main class="card">
+<div class="tabs"><button class="tab active" data-tab="all" onclick="setTab('all')">All</button><button class="tab" data-tab="decant" onclick="setTab('decant')">Potions</button><button class="tab" data-tab="enchant" onclick="setTab('enchant')">Enchanting</button><button class="tab" data-tab="debug" onclick="setTab('debug')">Debug</button></div>
+<div id="recommend" class="recommend"><div class="recTitle">Best opportunity</div><div class="recMain">Click PRINT MONEY</div><div class="small">zfinch will calculate exact buy/sell quantities for your bank.</div></div>
+<div id="tableWrap" class="scroll"><table><thead><tr><th>Method</th><th>Action</th><th>Buy</th><th>Sell</th><th>Cost</th><th>Return</th><th>Net</th><th>ROI</th><th>Cycles/5m</th><th>Score</th></tr></thead><tbody id="rows"></tbody></table></div>
+<pre id="debug" class="hidden small mono"></pre>
+</main></div></div>
+<script>
+const LATEST='https://prices.runescape.wiki/api/v1/osrs/latest';
+const FIVE='https://prices.runescape.wiki/api/v1/osrs/5m';
+const MAP='https://prices.runescape.wiki/api/v1/osrs/mapping';
+const TAX=0.02;
+let allOpps=[], activeTab='all', debugLines=[];
+const staplePotions = ['Prayer potion','Super restore','Saradomin brew','Stamina potion','Super combat potion','Ranging potion','Magic potion','Super attack','Super strength','Super defence','Combat potion','Antifire potion','Super energy','Energy potion','Agility potion','Antipoison','Superantipoison','Antidote+','Antidote++'];
+// Balanced mode lets more real opportunities through, but still blocks the classic slow-selling bait.
+const baitWords = ['anti-venom','bastion','battlemage','sanfew','goading','prayer regeneration','extended anti-venom','divine'];
+function isStapleBase(base){ return staplePotions.some(s=>base.trim().startsWith(s)); }
+function isBalancedBase(base){ const b=base.toLowerCase().trim(); if(isStapleBase(base)) return true; if(baitWords.some(w=>b.includes(w))) return false; return true; }
+const enchantRecipes = [
+ {name:'Ring of recoil',input:'Sapphire ring',output:'Ring of recoil',magic:7,runes:{'Cosmic rune':1,'Water rune':1}},
+ {name:'Games necklace',input:'Sapphire necklace',output:'Games necklace(8)',magic:7,runes:{'Cosmic rune':1,'Water rune':1}},
+ {name:'Amulet of magic',input:'Sapphire amulet',output:'Amulet of magic',magic:7,runes:{'Cosmic rune':1,'Water rune':1}},
+ {name:'Bracelet of clay',input:'Sapphire bracelet',output:'Bracelet of clay',magic:7,runes:{'Cosmic rune':1,'Water rune':1}},
+ {name:'Ring of dueling',input:'Emerald ring',output:'Ring of dueling(8)',magic:27,runes:{'Cosmic rune':1,'Air rune':3}},
+ {name:'Binding necklace',input:'Emerald necklace',output:'Binding necklace',magic:27,runes:{'Cosmic rune':1,'Air rune':3}},
+ {name:'Amulet of defence',input:'Emerald amulet',output:'Amulet of defence',magic:27,runes:{'Cosmic rune':1,'Air rune':3}},
+ {name:'Castle wars bracelet',input:'Emerald bracelet',output:'Castle wars bracelet(3)',magic:27,runes:{'Cosmic rune':1,'Air rune':3}},
+ {name:'Ring of forging',input:'Ruby ring',output:'Ring of forging',magic:49,runes:{'Cosmic rune':1,'Fire rune':5}},
+ {name:'Digsite pendant',input:'Ruby necklace',output:'Digsite pendant (5)',magic:49,runes:{'Cosmic rune':1,'Fire rune':5}},
+ {name:'Amulet of strength',input:'Ruby amulet',output:'Amulet of strength',magic:49,runes:{'Cosmic rune':1,'Fire rune':5}},
+ {name:'Inoculation bracelet',input:'Ruby bracelet',output:'Inoculation bracelet',magic:49,runes:{'Cosmic rune':1,'Fire rune':5}},
+ {name:'Ring of life',input:'Diamond ring',output:'Ring of life',magic:57,runes:{'Cosmic rune':1,'Earth rune':10}},
+ {name:'Phoenix necklace',input:'Diamond necklace',output:'Phoenix necklace',magic:57,runes:{'Cosmic rune':1,'Earth rune':10}},
+ {name:'Amulet of power',input:'Diamond amulet',output:'Amulet of power',magic:57,runes:{'Cosmic rune':1,'Earth rune':10}},
+ {name:'Abyssal bracelet',input:'Diamond bracelet',output:'Abyssal bracelet(5)',magic:57,runes:{'Cosmic rune':1,'Earth rune':10}},
+ {name:'Ring of wealth',input:'Dragonstone ring',output:'Ring of wealth (5)',magic:68,runes:{'Cosmic rune':1,'Earth rune':15,'Water rune':15}},
+ {name:'Skills necklace',input:'Dragon necklace',output:'Skills necklace(4)',magic:68,runes:{'Cosmic rune':1,'Earth rune':15,'Water rune':15}},
+ {name:'Combat bracelet',input:'Dragonstone bracelet',output:'Combat bracelet(4)',magic:68,runes:{'Cosmic rune':1,'Earth rune':15,'Water rune':15}},
+ {name:'Amulet of glory',input:'Dragonstone amulet',output:'Amulet of glory(4)',magic:68,runes:{'Cosmic rune':1,'Earth rune':15,'Water rune':15}}
+];
+function gp(n){return Math.round(n).toLocaleString('en-US')}
+function price(item,mode,side){ if(!item) return null; if(mode==='offer'){return side==='buy'?item.low:item.high}else{return side==='buy'?item.high:item.low} }
+function sellAfterTax(p){return Math.floor(p*(1-TAX));}
+function cycles5m(ids,volData,ratioIn=1,ratioOut=1){
+  // Estimate complete processing cycles using the weakest side of the trade.
+  // For 4x(3)->3x(4), divide input volume by 4 and output volume by 3.
+  if(!ids.length) return 0;
+  const vols=ids.map((id,idx)=>{const x=volData[id]||{}; const total=(Number(x.highPriceVolume)||0)+(Number(x.lowPriceVolume)||0); const ratio=idx===0?ratioIn:ratioOut; return Math.floor(total/Math.max(1,ratio));});
+  return Math.max(0, Math.min(...vols));
+}
+function score(net,roi,cycles,bankFit){let s=0; s+=Math.min(40, Math.max(0, net)/25); s+=Math.min(25, cycles/8); s+=Math.min(20, Math.max(0,roi)*800); s+=bankFit?15:0; return Math.round(Math.min(100,s));}
+async function fetchJson(url){let r=await fetch(url,{headers:{'Accept':'application/json'}}); if(!r.ok) throw new Error(url+' failed '+r.status); return await r.json();}
+async function scan(){
+ const bank=+document.getElementById('bank').value||0, magic=+document.getElementById('magic').value||1, minP=+document.getElementById('minProfit').value||0, minCycles=+document.getElementById('liq').value||0, safety=document.getElementById('safety').value, mode=document.getElementById('priceMode').value;
+ document.getElementById('status').textContent='Scanning...'; debugLines=[]; allOpps=[]; render();
+ try{
+  const [latest,five,map]=await Promise.all([fetchJson(LATEST),fetchJson(FIVE),fetchJson(MAP)]);
+  const itemsByName={}, itemsById={};
+  for(const m of map){itemsByName[m.name]=m; itemsById[m.id]=m;}
+  const p=latest.data, v=five.data;
+  function vol(id){
+    const x=v[id]||{};
+    // OSRS Wiki 5m API uses highPriceVolume and lowPriceVolume, not 'volume'.
+    return (Number(x.highPriceVolume)||0) + (Number(x.lowPriceVolume)||0);
+  }
+  function itemObj(name){const m=itemsByName[name]; if(!m||!p[m.id]) return null; return {...m,...p[m.id], volume:vol(m.id)};}
+  // Potions: 4x(3) -> 3x(4)
+  const potion3s=map.filter(x=>x.name.endsWith('(3)')); // v6.5: includes Super restore, Saradomin brew, etc. not just names containing 'potion'
+  let decantRaw=0, decantPassed=0;
+  for(const it3 of potion3s){
+    const base=it3.name.replace('(3)',''); const name4=base+'(4)'; const it4m=itemsByName[name4]; if(!it4m) continue;
+    const a=itemObj(it3.name), b=itemObj(name4); if(!a||!b) continue; decantRaw++;
+    const cleanBase=base.trim();
+    if(safety==='staples' && !isStapleBase(cleanBase)) {debugLines.push('skip non-staple decant '+base); continue;}
+    if(safety==='balanced' && !isBalancedBase(cleanBase)) {debugLines.push('skip bait/slow decant '+base); continue;}
+    const buy3=price(a,mode,'buy'), sell4=price(b,mode,'sell'); if(!buy3||!sell4) continue;
+    const cost=4*buy3, ret=3*sellAfterTax(sell4), net=ret-cost, roi=net/cost;
+    const cyc=cycles5m([a.id,b.id],v,4,3);
+    if(net<minP||cyc<minCycles) {debugLines.push(`filtered ${base}: net ${net}, cycles ${cyc}`); continue;}
+    const maxCyclesBank=Math.floor(bank/cost); if(maxCyclesBank<1) continue;
+    const cycles=Math.max(1, Math.min(maxCyclesBank, cyc||maxCyclesBank));
+    const totalCost=cycles*cost, totalRet=cycles*ret, totalNet=cycles*net;
+    allOpps.push({cat:'decant',method:base+' decant',action:`Buy ${cycles*4} ${it3.name} → sell ${cycles*3} ${name4}`,buy:buy3,sell:sell4,cost:totalCost,ret:totalRet,net:totalNet,roi:totalNet/totalCost,cycles5m:cyc,score:score(net,roi,cyc,totalCost<=bank)}); decantPassed++;
+  }
+  debugLines.push(`Dose decants raw=${decantRaw} passed=${decantPassed} (volume uses highPriceVolume+lowPriceVolume)`);
+  // Enchants: 1 input + runes -> 1 output
+  let enchRaw=0, enchPassed=0;
+  for(const r of enchantRecipes){ if(magic<r.magic) {debugLines.push('skip magic '+r.name); continue;} const input=itemObj(r.input), output=itemObj(r.output); if(!input||!output){debugLines.push('missing enchant '+r.input+' -> '+r.output); continue;} enchRaw++;
+    let runeCost=0, runeMissing=false; for(const [rn,qty] of Object.entries(r.runes)){const ri=itemObj(rn); if(!ri){runeMissing=true;break;} runeCost += qty*price(ri,mode,'buy');}
+    if(runeMissing) continue;
+    const buyIn=price(input,mode,'buy'), sellOut=price(output,mode,'sell'); if(!buyIn||!sellOut) continue;
+    const cost=buyIn+runeCost, ret=sellAfterTax(sellOut), net=ret-cost, roi=net/cost; const cyc=cycles5m([input.id,output.id],v,1,1);
+    if(net<minP||cyc<minCycles){debugLines.push(`filtered enchant ${r.name}: net ${net}, cycles ${cyc}`); continue;}
+    const qty=Math.max(1, Math.min(Math.floor(bank/cost), cyc||Math.floor(bank/cost))); if(qty<1) continue;
+    allOpps.push({cat:'enchant',method:r.name+' enchant',action:`Buy ${qty} ${r.input} + runes → sell ${qty} ${r.output}`,buy:buyIn,sell:sellOut,cost:qty*cost,ret:qty*ret,net:qty*net,roi:(qty*net)/(qty*cost),cycles5m:cyc,score:score(net,roi,cyc,qty*cost<=bank)}); enchPassed++;
+  }
+  debugLines.push(`Enchants raw=${enchRaw} passed=${enchPassed}`);
+  allOpps.sort((a,b)=>b.score-a.score || b.net-a.net);
+  document.getElementById('status').textContent='Done'; document.getElementById('lastScan').textContent=new Date().toLocaleTimeString(); render();
+ }catch(e){document.getElementById('status').textContent='Error'; debugLines.push(e.stack||e.message); render();}
+}
+function setTab(t){activeTab=t; document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t)); render();}
+function toggleDebug(){document.getElementById('debug').classList.toggle('hidden')}
+function render(){
+ let rows=allOpps.filter(o=>activeTab==='all'||activeTab===o.cat||activeTab==='debug'); document.getElementById('count').textContent=rows.length; document.getElementById('bestScore').textContent=allOpps[0]?.score??'-';
+ const tb=document.getElementById('rows'); tb.innerHTML=rows.map(o=>`<tr><td><b>${o.method}</b><br><span class="small">${o.cat}</span></td><td style="text-align:left">${o.action}</td><td>${gp(o.buy)}</td><td>${gp(o.sell)}</td><td>${gp(o.cost)}</td><td>${gp(o.ret)}</td><td class="${o.net>=0?'good':'bad'}">${gp(o.net)}</td><td>${(o.roi*100).toFixed(2)}%</td><td>${gp(o.cycles5m)}</td><td>${o.score}</td></tr>`).join('');
+ const best=allOpps[0]; document.getElementById('recommend').innerHTML = best ? `<div class="recTitle">Best opportunity right now</div><div class="recMain">${best.method}</div><div>${best.action}</div><div style="margin-top:8px"><span class="pill">Cost ${gp(best.cost)} gp</span><span class="pill">Return ${gp(best.ret)} gp</span><span class="pill good">Profit ${gp(best.net)} gp</span><span class="pill">ROI ${(best.roi*100).toFixed(2)}%</span><span class="pill">Score ${best.score}/100</span></div>` : `<div class="recTitle">Best opportunity</div><div class="recMain">No rows with current filters</div><div class="small">Try min profit 0 and liquidity debug to verify the scanner.</div>`;
+ document.getElementById('debug').textContent=debugLines.join('\n');
+}
+</script>
+</body></html>
