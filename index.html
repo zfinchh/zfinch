@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>zfinch OSRS Command Center v6.6</title>
+<title>zfinch OSRS Command Center v6.7</title>
 <style>
 :root{--bg:#0b1020;--panel:#11182b;--panel2:#17213a;--text:#eaf0ff;--muted:#98a6c7;--green:#35d07f;--red:#ff5c77;--yellow:#ffd166;--blue:#63a4ff;--border:#263454;}
 *{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#080c18,#101831);color:var(--text);font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;}
@@ -11,12 +11,22 @@ header{padding:22px 24px;border-bottom:1px solid var(--border);background:rgba(8
 h1{margin:0;font-size:24px}.sub{color:var(--muted);font-size:13px;margin-top:4px}.wrap{max-width:1250px;margin:0 auto;padding:18px}.grid{display:grid;grid-template-columns:330px 1fr;gap:16px}.card{background:rgba(17,24,43,.92);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 label{display:block;color:var(--muted);font-size:12px;margin:12px 0 6px} input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:#0e1526;color:var(--text);font-size:14px} button{border:0;border-radius:12px;padding:12px 14px;background:var(--blue);color:white;font-weight:700;cursor:pointer;width:100%;margin-top:12px}button.secondary{background:#263454}button.money{background:linear-gradient(135deg,#16c784,#35d07f);color:#05130b;font-size:16px}.stat{display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:8px 0;color:var(--muted)}.stat b{color:var(--text)}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tab{width:auto;background:#17213a;color:var(--muted);padding:9px 12px;margin:0}.tab.active{background:#263e73;color:#fff}.recommend{border:1px solid rgba(53,208,127,.45);background:linear-gradient(135deg,rgba(53,208,127,.15),rgba(99,164,255,.08));padding:16px;border-radius:15px;margin-bottom:14px}.recTitle{font-size:14px;color:var(--muted)}.recMain{font-size:22px;font-weight:800;margin:4px 0}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#263454;color:var(--muted);font-size:12px;margin:2px}.good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)}
-table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:10px 8px;border-bottom:1px solid var(--border);text-align:right} th:first-child,td:first-child{text-align:left} th{color:var(--muted);font-size:12px;background:#0e1526;position:sticky;top:79px;z-index:2}.scroll{overflow:auto;max-height:67vh;border-radius:12px}.small{font-size:12px;color:var(--muted);line-height:1.45}.hidden{display:none}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.footer{color:var(--muted);font-size:12px;margin-top:12px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}th{position:static}.scroll{max-height:none}}
+.scroll{overflow:auto;max-height:67vh;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;min-width:1180px;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed}
+th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:right;vertical-align:top;background:rgba(17,24,43,.96)}
+th:first-child,td:first-child{text-align:left;width:175px}
+th:nth-child(2),td:nth-child(2){text-align:left;width:390px;white-space:normal;line-height:1.35}
+th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){width:88px}
+th:nth-child(5),td:nth-child(5),th:nth-child(6),td:nth-child(6),th:nth-child(7),td:nth-child(7){width:105px}
+th:nth-child(8),td:nth-child(8){width:75px} th:nth-child(9),td:nth-child(9){width:90px} th:nth-child(10),td:nth-child(10){width:70px}
+th{color:#b8c7ee;font-size:12px;background:#0e1526;position:sticky;top:0;z-index:10;box-shadow:0 1px 0 var(--border),0 4px 10px rgba(0,0,0,.35)}
+tbody tr:hover td{background:#141f38}
+.small{font-size:12px;color:var(--muted);line-height:1.45}.hidden{display:none}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.footer{color:var(--muted);font-size:12px;margin-top:12px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}th{position:static}.scroll{max-height:none}table{min-width:1050px}}
 </style>
 </head>
 <body>
-<header><h1>zfinch OSRS Command Center <span class="pill">v6.6 volume fix build</span></h1><div class="sub">Live OSRS Wiki market scanner · decanting · enchanting · bank optimizer</div></header>
+<header><h1>zfinch OSRS Command Center <span class="pill">v6.7 readable table build</span></h1><div class="sub">Live OSRS Wiki market scanner · decanting · enchanting · bank optimizer</div></header>
 <div class="wrap"><div class="grid"><aside class="card">
 <h3>Scanner Settings</h3>
 <label>Bank GP</label><input id="bank" type="number" value="500000" min="0" step="1000" />
